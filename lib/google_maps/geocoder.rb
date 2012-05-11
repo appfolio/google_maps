@@ -1,18 +1,21 @@
-module Geocode
-  class Google
-    
-    GEOCODE_URI_BASE = "maps.googleapis.com/maps/api/geocode/json"
-    
-    def self.locate!(address, options = {})
+require 'google_maps/geocoder/result'
+require 'google_maps/geocoder/location'
+
+module GoogleMaps
+  module Geocoder
+
+    URI_BASE = "maps.googleapis.com/maps/api/geocode/json"
+
+    def self.locate!(address, options = { })
       options = {
-        :ssl => false,
+        :ssl    => false,
         :address => address,
         :sensor => false
       }.merge(options)
 
       json = ActiveSupport::JSON.decode RestClient.get(url(options))
 
-      Result.new(json)
+      Geocoder::Result.new(json)
     end
 
     def self.url(options)
@@ -24,10 +27,10 @@ module Geocode
       "#{uri_base_path(:ssl => ssl)}?#{parameters.join('&')}"
     end
 
-    def self.uri_base_path(options = {})
-      protocol = options[:ssl] ? "https"  : "http"
-      "#{protocol}://#{GEOCODE_URI_BASE}"
+    def self.uri_base_path(options = { })
+      protocol = options[:ssl] ? "https" : "http"
+      "#{protocol}://#{URI_BASE}"
     end
-    
+
   end
 end

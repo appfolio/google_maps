@@ -14,11 +14,11 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "geocode"
+  gem.name = "google_maps"
   gem.homepage = "http://github.com/appfolio/geocode"
   gem.license = "MIT"
-  gem.summary = %Q{Geocode addresses using google geocode v3 API}
-  gem.description = %Q{Geocode addresses using google geocode v3 API}
+  gem.summary = %Q{Gem to interact with Google Maps v3 API}
+  gem.description = %Q{General Purpose Library to interact with Google Maps v3 api. Geocoder. }
   gem.email = "tusharranka@gmail.com"
   gem.authors = ["Tushar Ranka"]
 end
