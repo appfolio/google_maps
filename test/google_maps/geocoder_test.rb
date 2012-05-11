@@ -1,10 +1,11 @@
 require 'test_helper'
 require 'mocha'
 
-class GoogleMaps::GeocoderTest < Test::Unit::TestCase
+class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
 
   def test_locate__castilian
-    RestClient.expects(:get).with(expected_url("address=50+Castilian+Drive%2C+Goleta%2C+CA&sensor=false")).returns(castilian_json)
+    GoogleMaps::Geocoder.expects(:url).with(:address => "50 Castilian Drive, Goleta, CA", :ssl => false, :sensor => false).returns(:url)
+    RestClient.expects(:get).with(:url).returns(castilian_json)
     result = GoogleMaps::Geocoder.locate!("50 Castilian Drive, Goleta, CA")
 
     assert result.status.ok?
@@ -20,7 +21,8 @@ class GoogleMaps::GeocoderTest < Test::Unit::TestCase
   end
 
   def test_locate__new_york
-    RestClient.expects(:get).with(expected_url("address=New+York&sensor=false")).returns(new_york_json)
+    GoogleMaps::Geocoder.expects(:url).with(:address => "New York", :ssl => false, :sensor => false).returns(:url)
+    RestClient.expects(:get).with(:url).returns(new_york_json)
     result = GoogleMaps::Geocoder.locate!("New York")
     assert result.status.ok?
 
@@ -52,11 +54,38 @@ class GoogleMaps::GeocoderTest < Test::Unit::TestCase
   end
 
   def test_url
-    assert_equal expected_url("address=50+Castilian+Drive%2C+Goleta%2C+CA&sensor=true"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => true, :ssl => false, :address => "50 Castilian Drive, Goleta, CA"))
-    assert_equal expected_url("address=50+Castilian+Drive%2C+Goleta%2C+CA&sensor=false", true), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :ssl => true, :address => "50 Castilian Drive, Goleta, CA"))
+    assert_url_parts expected_url("address=50+Castilian+Drive%2C+Goleta%2C+CA&sensor=true"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => true, :ssl => false, :address => "50 Castilian Drive, Goleta, CA"))
+    assert_url_parts expected_url("address=50+Castilian+Drive%2C+Goleta%2C+CA&sensor=false", true), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :ssl => true, :address => "50 Castilian Drive, Goleta, CA"))
+  end
+
+  def test_url__with_client_id
+    GoogleMaps.key = "bar"
+    GoogleMaps.enterprise_account = true
+    assert_url_parts expected_url("address=A&sensor=false&clientId=foo"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :address => "A", :clientId => 'foo'))
+    assert_url_parts expected_url("address=A&sensor=false&clientId=bar"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :address => "A"))
+    #assert_equal expected_url("address=A&sensor=false&clientId=foo"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :address => "A", :clientId => 'foo'))
+    #
   end
 
   private
+
+  def assert_url_parts(expected, actual)
+    expected_base_url, expected_url_params = expected.split('?')
+    actual_base_url, actual_url_params = actual.split('?')
+    assert_equal expected_base_url, actual_base_url
+
+    expected_params = url_params(expected_url_params)
+    actual_params   = url_params(actual_url_params)
+    assert_equal expected_params, actual_params
+  end
+
+  def url_params(params)
+    {}.tap do |hash|
+      params.split('&').each do |param|
+        hash[param.split('=').first]  = param.split('=').last
+      end
+    end
+  end
 
   def expected_url(parameters, ssl = false)
     "http#{'s' if ssl}://#{GoogleMaps::Geocoder::URI_BASE}?#{parameters}"
@@ -64,6 +93,9 @@ class GoogleMaps::GeocoderTest < Test::Unit::TestCase
 
   def ordered_hash(hash)
     oh = ActiveSupport::OrderedHash.new
+    oh[:address] = hash[:address] if hash[:address]
+    oh[:sensor] = hash[:sensor] if hash[:sensor]
+    oh[:clientId] = hash[:clientId] if hash[:clientId]
     oh.merge!(hash)
     oh
   end

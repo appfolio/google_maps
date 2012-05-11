@@ -16,7 +16,15 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'google_maps'
 
-class Test::Unit::TestCase
+class ActiveSupport::TestCase
+
+  setup :clear_configuration
+
+  def clear_configuration
+    GoogleMaps.enterprise_account = nil
+    GoogleMaps.key = nil
+  end
+
   def castilian_json
     "{\n   \"results\" : [\n      {\n         \"address_components\" : [\n            {\n               \"long_name\" : \"50\",\n               \"short_name\" : \"50\",\n               \"types\" : [ \"street_number\" ]\n            },\n            {\n               \"long_name\" : \"Castilian Dr\",\n               \"short_name\" : \"Castilian Dr\",\n               \"types\" : [ \"route\" ]\n            },\n            {\n               \"long_name\" : \"Goleta\",\n               \"short_name\" : \"Goleta\",\n               \"types\" : [ \"locality\", \"political\" ]\n            },\n            {\n               \"long_name\" : \"Santa Barbara\",\n               \"short_name\" : \"Santa Barbara\",\n               \"types\" : [ \"administrative_area_level_2\", \"political\" ]\n            },\n            {\n               \"long_name\" : \"California\",\n               \"short_name\" : \"CA\",\n               \"types\" : [ \"administrative_area_level_1\", \"political\" ]\n            },\n            {\n               \"long_name\" : \"United States\",\n               \"short_name\" : \"US\",\n               \"types\" : [ \"country\", \"political\" ]\n            },\n            {\n               \"long_name\" : \"93117\",\n               \"short_name\" : \"93117\",\n               \"types\" : [ \"postal_code\" ]\n            }\n         ],\n         \"formatted_address\" : \"50 Castilian Dr, Goleta, CA 93117, USA\",\n         \"geometry\" : {\n            \"location\" : {\n               \"lat\" : 34.43447590,\n               \"lng\" : -119.8639080\n            },\n            \"location_type\" : \"ROOFTOP\",\n            \"viewport\" : {\n               \"northeast\" : {\n                  \"lat\" : 34.43582488029149,\n                  \"lng\" : -119.8625590197085\n               },\n               \"southwest\" : {\n                  \"lat\" : 34.43312691970849,\n                  \"lng\" : -119.8652569802915\n               }\n            }\n         },\n         \"types\" : [ \"street_address\" ]\n      }\n   ],\n   \"status\" : \"OK\"\n}\n"
   end

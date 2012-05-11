@@ -20,6 +20,11 @@ module GoogleMaps
 
     def self.url(options)
       ssl = options.delete(:ssl)
+
+      if !options[:clientId] && ::GoogleMaps.enterprise_account
+        options.merge!(::GoogleMaps.geocoder_key_name => ::GoogleMaps.key)
+      end
+
       parameters = []
       options.each do |key, value|
         parameters << "#{key}=#{CGI.escape(value.to_s)}"
