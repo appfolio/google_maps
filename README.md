@@ -1,8 +1,18 @@
-= geocode
+# geocode
 
-Description goes here.
+Geocode addresses using Google's Geocode v3 API.
 
-== Contributing to geocode
+## Installation
+
+Using bundler
+  gem 'geocode'
+
+## Usage
+
+  result = Geocode::Google.locate! "50 Castilian Drive"
+
+
+## Contributing to geocode
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
@@ -14,6 +24,5 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2012 Tushar Ranka. See LICENSE.txt for
-further details.
+Copyright (c) 2012 AppFolio, Inc. See LICENSE.txt for further details.
 

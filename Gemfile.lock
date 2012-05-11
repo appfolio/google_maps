@@ -22,7 +22,6 @@ GEM
       json (~> 1.4)
     rest-client (1.6.7)
       mime-types (>= 1.16)
-    yard (0.8.1)
 
 PLATFORMS
   ruby
@@ -33,4 +32,3 @@ DEPENDENCIES
   jeweler (~> 1.8.3)
   mocha
   rest-client
-  yard (~> 0.7)
