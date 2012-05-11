@@ -1,0 +1,6 @@
+require 'rubygems'
+require 'rest_client'
+require 'active_support/all'
+require 'geocode/result'
+require 'geocode/location'
+require 'geocode/google'

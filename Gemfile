@@ -1,6 +1,7 @@
 source "http://rubygems.org"
 
 gem 'rest-client'
+gem 'activesupport'
 # Add dependencies required to use your gem here.
 # Example:
 #   gem "activesupport", ">= 2.3.5"
@@ -11,4 +12,5 @@ group :development do
   gem "yard", "~> 0.7"
   gem "bundler", "~> 1.0.0"
   gem "jeweler", "~> 1.8.3"
+  gem 'mocha'
 end
