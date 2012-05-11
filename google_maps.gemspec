@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "geocode.gemspec",
+    "google_maps.gemspec",
     "lib/google_maps.rb",
     "lib/google_maps/geocoder.rb",
     "lib/google_maps/geocoder/location.rb",
