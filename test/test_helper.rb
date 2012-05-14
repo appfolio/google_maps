@@ -15,14 +15,15 @@ require 'test/unit'
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'google_maps'
+require 'mocha'
 
 class ActiveSupport::TestCase
 
   setup :clear_configuration
 
   def clear_configuration
-    GoogleMaps.enterprise_account = nil
-    GoogleMaps.key = nil
+    GoogleMaps.send :class_variable_set, :@@key, nil
+    GoogleMaps.send :class_variable_set, :@@enterprise_account, false
   end
 
   def castilian_json

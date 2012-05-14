@@ -2,26 +2,33 @@ require 'google_maps/geocoder/result'
 require 'google_maps/geocoder/location'
 
 module GoogleMaps
+  class GeocodeFailed < StandardError
+    def initialize(location, original_error)
+      super "Failed while geocoding '#{location}': #{original_error.class.name}: #{original_error.message}"
+    end
+  end
+  
   module Geocoder
 
     URI_BASE = "maps.googleapis.com/maps/api/geocode/json"
 
     def self.locate!(address, options = { })
       options = {
-        :ssl    => false,
+        :ssl     => false,
         :address => address,
-        :sensor => false
+        :sensor  => false
       }.merge(options)
 
       json = ActiveSupport::JSON.decode RestClient.get(url(options))
-
       Geocoder::Result.new(json)
+    rescue => e
+      raise GeocodeFailed.new(address, e)
     end
 
     def self.url(options)
       ssl = options.delete(:ssl)
 
-      if !options[:clientId] && ::GoogleMaps.enterprise_account
+      if !options[:clientId] && ::GoogleMaps.enterprise_account?
         options.merge!(::GoogleMaps.geocoder_key_name => ::GoogleMaps.key)
       end
 
@@ -36,6 +43,5 @@ module GoogleMaps
       protocol = options[:ssl] ? "https" : "http"
       "#{protocol}://#{URI_BASE}"
     end
-
   end
 end

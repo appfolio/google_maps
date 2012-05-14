@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'mocha'
 
 class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
 
@@ -44,8 +43,25 @@ class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
     assert !manhattan_ny.location_type.rooftop?
     assert manhattan_ny.location_type.approximate?
     assert_equal ["sublocality", "political"], manhattan_ny.types
-
   end
+  
+  def test_locate__error
+    error = StandardError.new("there was an error doing that")
+    
+    GoogleMaps::Geocoder.expects(:url).returns(:url)
+    RestClient.expects(:get).with(:url).raises(error)
+    error_raised = false
+    begin
+      GoogleMaps::Geocoder.locate!("New York")
+    rescue => e
+      error_raised = true
+      assert e.is_a?(GoogleMaps::GeocodeFailed), e.class.name
+      assert_equal "Failed while geocoding 'New York': StandardError: there was an error doing that", e.message
+    end
+    
+    assert error_raised
+  end
+  
 
   def test_url_base_path
     assert_equal "http://#{GoogleMaps::Geocoder::URI_BASE}", GoogleMaps::Geocoder.uri_base_path
@@ -59,12 +75,10 @@ class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
   end
 
   def test_url__with_client_id
-    GoogleMaps.key = "bar"
-    GoogleMaps.enterprise_account = true
+    GoogleMaps.key "bar"
+    GoogleMaps.use_enterprise_account
     assert_url_parts expected_url("address=A&sensor=false&clientId=foo"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :address => "A", :clientId => 'foo'))
     assert_url_parts expected_url("address=A&sensor=false&clientId=bar"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :address => "A"))
-    #assert_equal expected_url("address=A&sensor=false&clientId=foo"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :address => "A", :clientId => 'foo'))
-    #
   end
 
   private
