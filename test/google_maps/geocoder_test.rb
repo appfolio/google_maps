@@ -74,13 +74,9 @@ class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
     assert_url_parts expected_url("address=50+Castilian+Drive%2C+Goleta%2C+CA&sensor=false", true), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :ssl => true, :address => "50 Castilian Drive, Goleta, CA"))
   end
 
-  def test_url__with_free_account
-    assert_url_parts expected_url("address=50+Castilian+Drive%2C+Goleta%2C+CA&sensor=true&key=foobar"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => true, :ssl => false, :address => "50 Castilian Drive, Goleta, CA", :key => 'foobar'))
-  end
-
   def test_url__with_enterprise_account
     GoogleMaps.client "clientID"
-    GoogleMaps.sign_key "vNIXE0xscrmjlyV-12Nj_BvUPaw="
+    GoogleMaps.key "vNIXE0xscrmjlyV-12Nj_BvUPaw="
     GoogleMaps.use_enterprise_account
     assert_equal expected_url("address=New+York&sensor=false&client=clientID&signature=KrU1TzVQM7Ur0i8i7K3huiw3MsA="), GoogleMaps::Geocoder.url(ordered_hash(:address => "New York", :sensor => false))
   end

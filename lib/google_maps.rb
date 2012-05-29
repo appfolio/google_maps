@@ -19,11 +19,11 @@ module GoogleMaps
     end
   end
   
-  def self.sign_key(*args)
+  def self.key(*args)
     if args.present?
-      @@sign_key = args.first
+      @@key = args.first
     else
-      @@sign_key
+      @@key
     end
   end
     

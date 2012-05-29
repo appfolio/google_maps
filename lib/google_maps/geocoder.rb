@@ -32,20 +32,20 @@ module GoogleMaps
       ssl      = options.delete(:ssl)
       # for enterprise account
       client   = options.delete(:client) || ::GoogleMaps.client
-      sign_key = options.delete(:sign_key) || ::GoogleMaps.sign_key  
+      key = options.delete(:key) || ::GoogleMaps.key  
 
       parameters = []
       options.each do |k, v|
         parameters << "#{k}=#{CGI.escape(v.to_s)}"
       end
       
-      if ::GoogleMaps.enterprise_account? && client && sign_key
+      if ::GoogleMaps.enterprise_account? && client && key
         parameters << "client=#{CGI.escape(client)}"
         sign_str = "#{URI_BASE}?#{parameters.join('&')}"
         sha1 = OpenSSL::Digest::Digest.new('sha1')
-        sign_key = Base64.decode64(sign_key.tr('-_','+/'))
-        signature = OpenSSL::HMAC.digest(sha1, sign_key, sign_str)
-        signature = Base64.encode64(signature).tr('+/','-_').strip
+        binary_key = Base64.decode64(key.tr('-_','+/'))
+        binary_signature = OpenSSL::HMAC.digest(sha1, binary_key, sign_str)
+        signature = Base64.encode64(binary_signature).tr('+/','-_').strip
         parameters << "signature=#{signature}"
       end
       

@@ -11,11 +11,12 @@ class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
   def test_configure__enterprise_account
     GoogleMaps.configure do |maps|
       maps.client "foobar"
-      maps.sign_key "foobarkey"
+      maps.key "foobarkey"
       maps.use_enterprise_account
     end
     
     assert_equal "foobar", GoogleMaps.client
+    assert_equal "foobarkey", GoogleMaps.key
     assert GoogleMaps.enterprise_account?
   end
 end
