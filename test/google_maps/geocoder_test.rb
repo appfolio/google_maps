@@ -64,9 +64,9 @@ class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
   
 
   def test_url_base_path
-    assert_equal "http://#{GoogleMaps::Geocoder::URI_BASE}", GoogleMaps::Geocoder.uri_base_path
-    assert_equal "http://#{GoogleMaps::Geocoder::URI_BASE}", GoogleMaps::Geocoder.uri_base_path(:ssl => false)
-    assert_equal "https://#{GoogleMaps::Geocoder::URI_BASE}", GoogleMaps::Geocoder.uri_base_path(:ssl => true)
+    assert_equal "http://#{GoogleMaps::Geocoder::URI_DOMAIN}#{GoogleMaps::Geocoder::URI_BASE}", GoogleMaps::Geocoder.uri_base_path
+    assert_equal "http://#{GoogleMaps::Geocoder::URI_DOMAIN}#{GoogleMaps::Geocoder::URI_BASE}", GoogleMaps::Geocoder.uri_base_path(:ssl => false)
+    assert_equal "https://#{GoogleMaps::Geocoder::URI_DOMAIN}#{GoogleMaps::Geocoder::URI_BASE}", GoogleMaps::Geocoder.uri_base_path(:ssl => true)
   end
 
   def test_url
@@ -74,11 +74,15 @@ class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
     assert_url_parts expected_url("address=50+Castilian+Drive%2C+Goleta%2C+CA&sensor=false", true), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :ssl => true, :address => "50 Castilian Drive, Goleta, CA"))
   end
 
-  def test_url__with_client_id
-    GoogleMaps.key "bar"
+  def test_url__with_free_account
+    assert_url_parts expected_url("address=50+Castilian+Drive%2C+Goleta%2C+CA&sensor=true&key=foobar"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => true, :ssl => false, :address => "50 Castilian Drive, Goleta, CA", :key => 'foobar'))
+  end
+
+  def test_url__with_enterprise_account
+    GoogleMaps.client "clientID"
+    GoogleMaps.sign_key "vNIXE0xscrmjlyV-12Nj_BvUPaw="
     GoogleMaps.use_enterprise_account
-    assert_url_parts expected_url("address=A&sensor=false&clientId=foo"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :address => "A", :clientId => 'foo'))
-    assert_url_parts expected_url("address=A&sensor=false&clientId=bar"), GoogleMaps::Geocoder.url(ordered_hash(:sensor => false, :address => "A"))
+    assert_equal expected_url("address=New+York&sensor=false&client=clientID&signature=KrU1TzVQM7Ur0i8i7K3huiw3MsA="), GoogleMaps::Geocoder.url(ordered_hash(:address => "New York", :sensor => false))
   end
 
   private
@@ -102,7 +106,7 @@ class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
   end
 
   def expected_url(parameters, ssl = false)
-    "http#{'s' if ssl}://#{GoogleMaps::Geocoder::URI_BASE}?#{parameters}"
+    "http#{'s' if ssl}://#{GoogleMaps::Geocoder::URI_DOMAIN}#{GoogleMaps::Geocoder::URI_BASE}?#{parameters}"
   end
 
   def ordered_hash(hash)

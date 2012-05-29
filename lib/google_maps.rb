@@ -11,14 +11,22 @@ module GoogleMaps
     block.call(self)
   end
   
-  def self.key(*args)
+  def self.client(*args)
     if args.present?
-      @@key = args.first
+      @@client = args.first
     else
-      @@key
+      @@client
     end
   end
   
+  def self.sign_key(*args)
+    if args.present?
+      @@sign_key = args.first
+    else
+      @@sign_key
+    end
+  end
+    
   def self.use_enterprise_account(*args)
     if args.first.present? && args.first == false
       @@enterprise_account = false
@@ -31,11 +39,4 @@ module GoogleMaps
     @@enterprise_account || false
   end
 
-  def self.key_name
-    enterprise_account? ? :client : :key
-  end
-
-  def self.geocoder_key_name
-    :clientId if enterprise_account?
-  end
 end
