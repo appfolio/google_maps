@@ -30,12 +30,11 @@ module GoogleMaps
       ]
 
       ACCURATE_TYPES      = [ "street_address", "premise", "subpremise" ]
-      
-      
 
-      attr_accessor :formatted_address, :location_type, :latitude, :longitude, :types
+      attr_accessor :formatted_address, :location_type, :latitude, :longitude, :types, :address_components
 
       def initialize(json)
+        self.address_components = json['address_components']
         self.formatted_address = json['formatted_address']
         if geometry_json = json['geometry']
           self.location_type = ActiveSupport::StringInquirer.new(geometry_json['location_type'].downcase)
@@ -45,13 +44,36 @@ module GoogleMaps
             self.longitude = BigDecimal(geometry_json['location']['lng'].to_s)
           end
         end
-
-        self.types         = json['types']
+        self.types = json['types']
       end
-
 
       def street_address?
         (ACCURATE_TYPES & self.types).present?
+      end
+
+      def method_missing(method_sym, *args, &block)
+        if TYPES.include?(method_sym.to_s)
+          define_address_component_accessor_for_type(method_sym)
+          send(method_sym, args.first)
+        else
+          super
+        end
+      end
+
+      def respond_to?(method_sym, include_private = false)
+        TYPES.include?(method_sym.to_s) || super
+      end
+
+    private
+
+      def define_address_component_accessor_for_type(type_symbol)
+        class_eval %Q{
+          def #{type_symbol}(arg=nil)
+            component = address_components.select { |ac| ac['types'].include?('#{type_symbol.to_s}') }.first
+            return nil if component.blank?
+            (arg.to_s == 'short') ? component['short_name'] : component['long_name']
+          end
+        }
       end
 
     end
