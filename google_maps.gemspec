@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "google_maps"
-  s.version = "0.3.0"
+  s.version = "0.3.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Tushar Ranka"]
-  s.date = "2012-05-30"
+  s.date = "2013-05-22"
   s.description = "General Purpose Library to interact with Google Maps v3 api. Geocoder. "
   s.email = "tusharranka@gmail.com"
   s.extra_rdoc_files = [
@@ -37,7 +37,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/appfolio/geocode"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.12"
+  s.rubygems_version = "1.8.25"
   s.summary = "Gem to interact with Google Maps v3 API"
 
   if s.respond_to? :specification_version then

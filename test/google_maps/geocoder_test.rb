@@ -44,6 +44,63 @@ class GoogleMaps::GeocoderTest < ActiveSupport::TestCase
     assert manhattan_ny.location_type.approximate?
     assert_equal ["sublocality", "political"], manhattan_ny.types
   end
+
+  def test_all_encompassing_json
+    GoogleMaps::Geocoder.expects(:url).with(:address => "80 Leonard Street, New York, NY 10013", :ssl => false, :sensor => false).returns(:url)
+
+    RestClient.expects(:get).with(:url).returns(all_encompassing_json)
+    results = GoogleMaps::Geocoder.locate!("80 Leonard Street, New York, NY 10013")
+
+    assert results.status.ok?
+
+    result = results.first
+    assert_equal "80", result.street_number
+    assert_equal "Leonard Street", result.route
+    assert_equal "Lower Manhattan", result.neighborhood
+    assert_equal "Manhattan", result.sublocality
+    assert_equal "New York", result.locality
+    assert_equal "New York", result.administrative_area_level_1
+    assert_equal "New York", result.administrative_area_level_2
+    assert_equal "New York", result.administrative_area_level_3
+    assert_equal "United States", result.country
+    assert_equal "10013", result.postal_code
+    assert_equal "Premise Long", result.premise
+    assert_equal "Subpremise Long", result.subpremise
+    assert_equal "Pretty Mountain Long", result.natural_feature
+    assert_equal "La Guardia", result.airport
+    assert_equal "Central Park", result.park
+    assert_equal "Statue of Liberty", result.point_of_interest
+    assert_equal "272510 Long", result.post_box
+    assert_equal "13.5", result.floor
+    assert_equal nil, result.room
+
+    assert_equal "80", result.street_number(:short)
+    assert_equal "Leonard St", result.route(:short)
+    assert_equal "Lower Manhattan", result.neighborhood(:short)
+    assert_equal "Manhattan", result.sublocality(:short)
+    assert_equal "New York", result.locality(:short)
+    assert_equal "NY", result.administrative_area_level_1(:short)
+    assert_equal "New York", result.administrative_area_level_2(:short)
+    assert_equal "New York", result.administrative_area_level_3(:short)
+    assert_equal "US", result.country(:short)
+    assert_equal "10013", result.postal_code(:short)
+    assert_equal "Premise Short", result.premise(:short)
+    assert_equal "Subpremise Short", result.subpremise(:short)
+    assert_equal "Pretty Mountain Short", result.natural_feature(:short)
+    assert_equal "La Guardia", result.airport(:short)
+    assert_equal "Central Park", result.park(:short)
+    assert_equal "Statue of Liberty", result.point_of_interest(:short)
+    assert_equal "272510 Short", result.post_box(:short)
+    assert_equal "13.5", result.floor(:short)
+    assert_equal nil, result.room(:short)
+
+    assert result.respond_to?(:street_number)
+    assert result.respond_to?(:street_address?)
+
+    assert_raise NoMethodError do
+      result.this_field_is_not_present_in_address_components
+    end
+  end
   
   def test_locate__error
     error = StandardError.new("there was an error doing that")
